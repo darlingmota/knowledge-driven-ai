@@ -93,9 +93,16 @@ def get_neighbours(state):
 
 
 
+import heapq  # priority queue: always pops the smallest value first
+
 # -------*----------------------------------*-------
 # TASK 0 - MANUAL HEURISTIC EXPLORATION
 # -------------------*------------------------------
+# With goal (4, 4):
+#   A (0, 0) -> 4 + 4 = 8 steps away (as the crow walks the grid)
+#   B (2, 2) -> 2 + 2 = 4
+#   C (4, 3) -> 0 + 1 = 1   <- looks most promising
+# A heuristic is just a cheap guess like this that steers the search.
 
 
 
@@ -114,9 +121,11 @@ def manhattan_distance(state, goal):
     abs(goal_y - current_y)
     """
 
-    # TODO
-
-    pass
+    # Manhattan distance = how many grid steps you'd need if there were
+    # no walls. It never OVERestimates the true cost (walls only make
+    # the trip longer), which is exactly why A* can trust it.
+    (x, y), (gx, gy) = state, goal
+    return abs(gx - x) + abs(gy - y)
 
 
 # --------------------------------------------------
@@ -156,9 +165,25 @@ def greedy_best_first_search(start, goal):
     path cost so far
     """
 
-    # TODO
+    # Greedy always expands whichever frontier state LOOKS closest to the
+    # goal (smallest h). It's fast, but it ignores how far it has already
+    # walked, so it can be lured into a longer route.
+    counter = 0                      # tie-breaker so heapq never compares tuples of states
+    frontier = [(manhattan_distance(start, goal), counter, start)]
+    parents = {start: None}
 
-    pass
+    while frontier:
+        _, _, state = heapq.heappop(frontier)
+        if state == goal:
+            return reconstruct_path(parents, goal)
+
+        for nxt in get_neighbours(state):
+            if nxt not in parents:   # parents doubles as our visited set
+                parents[nxt] = state
+                counter += 1
+                heapq.heappush(frontier, (manhattan_distance(nxt, goal), counter, nxt))
+
+    return None
 
 
 # --------------------------------------------------
@@ -181,9 +206,32 @@ def astar(start, goal):
     h(n) = Manhattan Distance
     """
 
-    # TODO
+    # A* ranks states by f = g + h:
+    #   g = steps actually taken to get here
+    #   h = Manhattan guess of steps still to go
+    # With a heuristic that never overestimates, the first time we POP the
+    # goal we have the cheapest path.
+    counter = 0
+    frontier = [(manhattan_distance(start, goal), counter, start)]
+    parents = {start: None}
+    g_cost = {start: 0}              # best known cost to reach each state
 
-    pass
+    while frontier:
+        _, _, state = heapq.heappop(frontier)
+        if state == goal:
+            return reconstruct_path(parents, goal)
+
+        for nxt in get_neighbours(state):
+            new_g = g_cost[state] + 1          # every move costs 1
+            # Only (re)queue a state if we found a cheaper way to reach it.
+            if nxt not in g_cost or new_g < g_cost[nxt]:
+                g_cost[nxt] = new_g
+                parents[nxt] = state
+                counter += 1
+                f = new_g + manhattan_distance(nxt, goal)
+                heapq.heappush(frontier, (f, counter, nxt))
+
+    return None
 
 
 # --------------------------------------------------
