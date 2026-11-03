@@ -32,6 +32,20 @@ def forward_chaining(known_facts, rules):
     # TODO
     pass
 
+# task 3
+
+def forward_chaining(known_facts, rules):
+    # copy so we dont change the original facts
+    inferred = set(known_facts)
+    changed = True
+    while changed:
+        changed = False
+        for conditions, conclusion in rules:
+            # rule fires if every condition is already known
+            if all(c in inferred for c in conditions) and conclusion not in inferred:
+                inferred.add(conclusion)
+                changed = True  # new fact so check the rules again
+    return inferred
 
 def query(inferred_facts, statement):
     """TASK 4 — Return True if statement is established in inferred_facts.
@@ -41,6 +55,12 @@ def query(inferred_facts, statement):
     # TODO
     pass
 
+
+# task 4
+
+def query(inferred_facts, statement):
+    # false means we cant prove it, not that its actually false
+    return statement in inferred_facts
 
 if __name__ == "__main__":
     print("=" * 55)
@@ -67,6 +87,7 @@ if __name__ == "__main__":
 
     print("\nTASK 5 — BACKWARD CHAINING (discussion)")
     print("Goal: stay_dry. Which rule concludes it? What must be true first?")
+    
     print("\nTASK 6 — LOGIC DISCUSSION")
     print("Is 'IF rainy THEN take_umbrella' always true in the real world?")
     print("What assumptions does the rule make?")
