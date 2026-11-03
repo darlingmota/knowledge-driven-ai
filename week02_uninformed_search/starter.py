@@ -111,7 +111,26 @@ def bfs(start, goal):
 
     # remove pass for your solution. This is only here to 
     # make sure that there are no errors displayed.
-    pass
+    # BFS explores the grid in "rings": everything 1 step away, then 2 steps...
+    # A queue (first in, first out) gives us exactly that order.
+    # Each queue entry is a whole path, so when we reach the goal
+    # the route is already built for us.
+    queue = deque([[start]])
+    visited = {start}  # mark states when we ADD them, so nothing is queued twice
+
+    while queue:
+        path = queue.popleft()      # oldest path first
+        state = path[-1]            # where that path currently ends
+
+        if state == goal:
+            return path             # first time we reach the goal = shortest path
+
+        for nxt in get_neighbours(state):
+            if nxt not in visited:
+                visited.add(nxt)
+                queue.append(path + [nxt])
+
+    return None  # queue ran dry: the goal can't be reached
 
 
 # --------------------------------------------------
@@ -135,7 +154,27 @@ def dfs(start, goal):
     
     # remove pass for your solution. This is only here to 
     # make sure that there are no errors displayed.
-    pass
+    # DFS dives as deep as it can down one route before backing up.
+    # A plain list used as a stack (last in, first out) does that.
+    stack = [[start]]
+    visited = set()
+
+    while stack:
+        path = stack.pop()          # newest path first
+        state = path[-1]
+
+        if state in visited:
+            continue                # already explored from here
+        visited.add(state)
+
+        if state == goal:
+            return path             # a valid path, but not necessarily the shortest
+
+        for nxt in get_neighbours(state):
+            if nxt not in visited:
+                stack.append(path + [nxt])
+
+    return None
 
 
 # --------------------------------------------------
