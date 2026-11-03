@@ -57,7 +57,19 @@ class GridProblem(Problem):
         # 4. Add valid actions to the list.
         # 5. Return the list.
 
-        pass
+        x, y = state
+        actions = []
+        # Check each direction against the grid edges (0 .. GRID_SIZE-1).
+        # y grows downwards, so UP means y - 1.
+        if y > 0:
+            actions.append("UP")
+        if y < GRID_SIZE - 1:
+            actions.append("DOWN")
+        if x > 0:
+            actions.append("LEFT")
+        if x < GRID_SIZE - 1:
+            actions.append("RIGHT")
+        return actions
 
     def result(self, state, action):
         """
@@ -77,7 +89,13 @@ class GridProblem(Problem):
         # 2. Check which action was requested.
         # 3. Return the resulting state.
 
-        pass
+        x, y = state
+        # A small lookup table: each action name -> how it changes (x, y).
+        # actions() already made sure the move is legal, so result() can
+        # just apply it.
+        deltas = {"UP": (0, -1), "DOWN": (0, 1), "LEFT": (-1, 0), "RIGHT": (1, 0)}
+        dx, dy = deltas[action]
+        return (x + dx, y + dy)
 
 
 # --------------------------------------------------

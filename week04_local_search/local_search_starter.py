@@ -83,7 +83,18 @@ def count_conflicts(board):
     #   1. in the same row
     #   2. on the same diagonal
 
-    pass
+    conflicts = 0
+    n = len(board)
+    # Only compare each pair ONCE (i < j), otherwise every clash counts twice.
+    for i in range(n):
+        for j in range(i + 1, n):
+            same_row = board[i] == board[j]
+            # Two queens share a diagonal when the row gap equals the column gap.
+            same_diagonal = abs(board[i] - board[j]) == abs(i - j)
+            if same_row or same_diagonal:
+                conflicts += 1
+    # (Same column is impossible: one queen per column is built into the state.)
+    return conflicts
 
 
 # --------------------------------------------------
@@ -107,6 +118,10 @@ def generate_neighbours(problem, board):
     # 1. Ask the problem for the available actions.
     # 2. Apply each action.
     # 3. Add the resulting state to neighbours.
+    # Every action = "move the queen in one column to a different row".
+    # For 8 queens that's 8 columns x 7 other rows = 56 neighbours.
+    for action in problem.actions(board):
+        neighbours.append(problem.result(board, action))
 
     return neighbours
 
@@ -142,9 +157,25 @@ def hill_climbing(problem, start_board):
 
     current = start_board
 
-    # TODO
+    current_cost = count_conflicts(current)
+    steps = 0
 
-    pass
+    while True:
+        # Look at every neighbour and pick the one with the fewest conflicts.
+        neighbours = generate_neighbours(problem, current)
+        best = min(neighbours, key=count_conflicts)
+        best_cost = count_conflicts(best)
+
+        # No neighbour is strictly better -> we're at the top of our "hill"
+        # (a solution if cost is 0, otherwise a local minimum / plateau).
+        if best_cost >= current_cost:
+            break
+
+        current, current_cost = best, best_cost
+        steps += 1
+
+    print(f"Hill Climbing stopped after {steps} steps with {current_cost} conflicts")
+    return current
 
 
 # --------------------------------------------------
@@ -167,9 +198,30 @@ def simulated_annealing(problem, start_board):
     temperature = 10.0
     cooling_rate = 0.95
 
-    # TODO
+    current_cost = count_conflicts(current)
+    steps = 0
 
-    pass
+    # Keep going until we solve it or the temperature is basically zero.
+    while current_cost > 0 and temperature > 0.001:
+        # Pick ONE random neighbour (much cheaper than checking them all).
+        action = random.choice(problem.actions(current))
+        candidate = problem.result(current, action)
+        candidate_cost = count_conflicts(candidate)
+
+        # delta < 0 means the candidate is better.
+        delta = candidate_cost - current_cost
+
+        # Always take an improvement. Take a WORSE move with probability
+        # e^(-delta / T): likely when hot, rare once cooled. That occasional
+        # "bad" move is what lets us climb out of local minima.
+        if delta < 0 or random.random() < math.exp(-delta / temperature):
+            current, current_cost = candidate, candidate_cost
+
+        temperature *= cooling_rate   # cool down a little every step
+        steps += 1
+
+    print(f"Simulated Annealing stopped after {steps} steps with {current_cost} conflicts")
+    return current
 
 
 # --------------------------------------------------
@@ -211,3 +263,26 @@ if __name__ == "__main__":
     print(
         f"{len(neighbours)} neighbours generated"
     )
+    # Task 0 answer: [0, 1, 2, 3] puts every queen on one diagonal,
+    # so all 4*3/2 = 6 pairs attack each other.
+    print("\nConflicts on the manual board:", count_conflicts(example_board))
+
+    print("\nHill Climbing")
+    hc_board = hill_climbing(problem, board)
+    print(hc_board, "->", count_conflicts(hc_board), "conflicts")
+
+    print("\nSimulated Annealing")
+    sa_board = simulated_annealing(problem, board)
+    print(sa_board, "->", count_conflicts(sa_board), "conflicts")
+
+    # Quick experiment: how often does each method fully solve 8-queens?
+    trials = 50
+    hc_wins = sa_wins = 0
+    import contextlib, io
+    for _ in range(trials):
+        b = [random.randint(0, N - 1) for _ in range(N)]
+        with contextlib.redirect_stdout(io.StringIO()):   # hide per-run prints
+            hc_wins += count_conflicts(hill_climbing(problem, b)) == 0
+            sa_wins += count_conflicts(simulated_annealing(problem, b)) == 0
+    print(f"\nOut of {trials} random boards: Hill Climbing solved {hc_wins}, "
+          f"Simulated Annealing solved {sa_wins}")
