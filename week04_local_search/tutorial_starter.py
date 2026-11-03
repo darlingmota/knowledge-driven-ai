@@ -59,8 +59,7 @@ class GridProblem(Problem):
 
         x, y = state
         actions = []
-        # Check each direction against the grid edges (0 .. GRID_SIZE-1).
-        # y grows downwards, so UP means y - 1.
+        # only add a direction if it stays on the grid
         if y > 0:
             actions.append("UP")
         if y < GRID_SIZE - 1:
@@ -90,12 +89,15 @@ class GridProblem(Problem):
         # 3. Return the resulting state.
 
         x, y = state
-        # A small lookup table: each action name -> how it changes (x, y).
-        # actions() already made sure the move is legal, so result() can
-        # just apply it.
-        deltas = {"UP": (0, -1), "DOWN": (0, 1), "LEFT": (-1, 0), "RIGHT": (1, 0)}
-        dx, dy = deltas[action]
-        return (x + dx, y + dy)
+        # move one square in the chosen direction
+        if action == "UP":
+            return (x, y - 1)
+        if action == "DOWN":
+            return (x, y + 1)
+        if action == "LEFT":
+            return (x - 1, y)
+        if action == "RIGHT":
+            return (x + 1, y)
 
 
 # --------------------------------------------------

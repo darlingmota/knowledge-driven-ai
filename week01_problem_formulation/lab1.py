@@ -87,18 +87,14 @@ def get_neighbours(state):
 
     x, y = state
 
-    # The four moves, written as (dx, dy) changes to the position.
-    # Remember y grows DOWNWARDS here, so "up" means y - 1.
-    moves = [(0, -1), (0, 1), (-1, 0), (1, 0)]  # up, down, left, right
+    # all four moves: up, down, left, right
+    moves = [(x, y - 1), (x, y + 1), (x - 1, y), (x + 1, y)]
 
-    for dx, dy in moves:
-        nx, ny = x + dx, y + dy
-        # Only keep the move if it stays on the board.
-        # Valid coordinates run from 0 to GRID_SIZE - 1 in both directions.
-        if 0 <= nx < GRID_SIZE and 0 <= ny < GRID_SIZE:
-            neighbours.append((nx, ny))
-
-    # Corners get 2 neighbours, edges get 3, the middle gets 4.
+    for move in moves:
+        new_x, new_y = move
+        # only keep it if it's still on the grid
+        if 0 <= new_x < GRID_SIZE and 0 <= new_y < GRID_SIZE:
+            neighbours.append(move)
 
     return neighbours
 

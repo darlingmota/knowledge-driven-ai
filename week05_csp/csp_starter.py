@@ -75,11 +75,12 @@ def is_valid_assignment(assignment):
     # 2. If BOTH regions have been assigned, compare their colours.
     # 3. Return False if neighbouring regions have the same colour.
     # 4. Otherwise return True.
-    for a, b in constraints:
-        # A pair only matters once BOTH sides have a colour. That's what
-        # lets us reject bad partial assignments early.
-        if a in assignment and b in assignment and assignment[a] == assignment[b]:
-            return False
+    for region1, region2 in constraints:
+        # only check pairs where both regions have a colour
+        if region1 in assignment and region2 in assignment:
+            # neighbours can't share a colour
+            if assignment[region1] == assignment[region2]:
+                return False
     return True
 
 
@@ -104,29 +105,32 @@ def select_unassigned_variable(assignment):
     # For each unassigned variable, temporarily try each colour,
     # check is_valid_assignment(), and undo the temporary assignment.
     # Count legal colours and choose the variable with the fewest.
-    unassigned = [v for v in variables if v not in assignment]
-    if not unassigned:
-        return None
+    # task 3 version: just return the first unassigned region
+    # task 5 version (MRV): pick the region with the fewest legal colours
+    best_region = None
+    best_count = None
 
-    # Task 3 version was simply: return unassigned[0]
-    #
-    # Task 5, MRV: pick the region with the fewest colours still allowed.
-    # The most "boxed-in" region is the one most likely to fail, so we
-    # tackle it first and find dead ends sooner ("fail first").
-    def legal_colour_count(var):
+    for region in variables:
+        if region in assignment:
+            continue
+
+        # count how many colours are still allowed here
         count = 0
-        for colour in domains[var]:
-            assignment[var] = colour          # try it...
+        for colour in domains[region]:
+            assignment[region] = colour
             if is_valid_assignment(assignment):
-                count += 1
-            del assignment[var]               # ...and undo it straight away
-        return count
+                count = count + 1
+            del assignment[region]
 
-    # min() keeps the first one on ties, so ties follow the order in variables.
-    return min(unassigned, key=legal_colour_count)
+        # keep the one with the fewest (first one wins ties)
+        if best_region is None or count < best_count:
+            best_region = region
+            best_count = count
+
+    return best_region
 
 
-nodes_explored = 0  # counts colour attempts, for comparing with brute force
+nodes_explored = 0  # how many colours we tried
 
 # --------------------------------------------------
 # TASK 3 — BACKTRACKING SEARCH
@@ -143,21 +147,30 @@ def backtracking_search(assignment):
     # 6. Otherwise remove the temporary assignment (backtrack).
     # 7. Return None if every colour fails.
     global nodes_explored
-    if len(assignment) == len(variables):
-        return dict(assignment)               # copy, so later undos can't change it
 
-    var = select_unassigned_variable(assignment)
-    for colour in domains[var]:
-        assignment[var] = colour
-        nodes_explored += 1
-        # Only go deeper if nothing is broken yet. A bad partial
-        # assignment gets cut off here, along with every completion of it.
+    # every region has a colour, so we're done
+    if len(assignment) == len(variables):
+        return dict(assignment)
+
+    # pick the next region to colour
+    region = select_unassigned_variable(assignment)
+
+    for colour in domains[region]:
+        # try this colour
+        assignment[region] = colour
+        nodes_explored = nodes_explored + 1
+
+        # only keep going if nothing clashes yet
         if is_valid_assignment(assignment):
             result = backtracking_search(assignment)
             if result is not None:
                 return result
-        del assignment[var]                   # backtrack: undo and try the next colour
-    return None                               # every colour failed -> tell the caller
+
+        # didn't work, undo it and try the next colour
+        del assignment[region]
+
+    # no colour worked here
+    return None
 
 
 # --------------------------------------------------
@@ -167,14 +180,11 @@ def backtracking_search(assignment):
 # Six regions with three possible colours each give 3 ** 6 = 729
 # complete assignments. Why can backtracking avoid checking all 729?
 #
-# Answer: it checks constraints on PARTIAL assignments. As soon as two
-# neighbours clash, every one of the completions below that point is
-# skipped in one go. Brute force would build and test each one.
+# answer: it stops as soon as two neighbours clash, so it skips
+# all the full assignments that would start that way
 #
-# Task 0 answers: the example is NOT valid. Two pairs clash:
-#   WA-NT (both Red) and SA-V (both Green).
-# One fix: WA -> Blue (its neighbours are NT=Red, SA=Green) and
-# V -> Blue (its neighbours are SA=Green, NSW=Red).
+# task 0: not valid. WA-NT are both Red and SA-V are both Green.
+# fix: make WA Blue and V Blue
 
 
 # --------------------------------------------------
@@ -182,9 +192,7 @@ def backtracking_search(assignment):
 # --------------------------------------------------
 
 if __name__ == "__main__":
-    print("\n" + "=" * 50)
-    print("WEEK 5 — CONSTRAINT SATISFACTION PROBLEMS")
-    print("=" * 50)
+    print("\nWeek 5: constraint satisfaction problems")
 
     print("\nVariables:", variables)
     print("Domains:", domains)

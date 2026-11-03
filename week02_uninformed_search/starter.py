@@ -111,26 +111,30 @@ def bfs(start, goal):
 
     # remove pass for your solution. This is only here to 
     # make sure that there are no errors displayed.
-    # BFS explores the grid in "rings": everything 1 step away, then 2 steps...
-    # A queue (first in, first out) gives us exactly that order.
-    # Each queue entry is a whole path, so when we reach the goal
-    # the route is already built for us.
-    queue = deque([[start]])
-    visited = {start}  # mark states when we ADD them, so nothing is queued twice
+    # queue holds paths, start with just the start state
+    queue = deque()
+    queue.append([start])
+    visited = set()
+    visited.add(start)
 
-    while queue:
-        path = queue.popleft()      # oldest path first
-        state = path[-1]            # where that path currently ends
+    while len(queue) > 0:
+        # take the oldest path out of the queue
+        path = queue.popleft()
+        current = path[-1]
 
-        if state == goal:
-            return path             # first time we reach the goal = shortest path
+        # check if we reached the goal
+        if current == goal:
+            return path
 
-        for nxt in get_neighbours(state):
-            if nxt not in visited:
-                visited.add(nxt)
-                queue.append(path + [nxt])
+        # add each new neighbour to the end of the queue
+        for neighbour in get_neighbours(current):
+            if neighbour not in visited:
+                visited.add(neighbour)
+                new_path = path + [neighbour]
+                queue.append(new_path)
 
-    return None  # queue ran dry: the goal can't be reached
+    # no path found
+    return None
 
 
 # --------------------------------------------------
@@ -154,26 +158,32 @@ def dfs(start, goal):
     
     # remove pass for your solution. This is only here to 
     # make sure that there are no errors displayed.
-    # DFS dives as deep as it can down one route before backing up.
-    # A plain list used as a stack (last in, first out) does that.
-    stack = [[start]]
+    # stack holds paths, start with just the start state
+    stack = []
+    stack.append([start])
     visited = set()
 
-    while stack:
-        path = stack.pop()          # newest path first
-        state = path[-1]
+    while len(stack) > 0:
+        # take the newest path off the stack
+        path = stack.pop()
+        current = path[-1]
 
-        if state in visited:
-            continue                # already explored from here
-        visited.add(state)
+        # skip it if we've been here already
+        if current in visited:
+            continue
+        visited.add(current)
 
-        if state == goal:
-            return path             # a valid path, but not necessarily the shortest
+        # check if we reached the goal
+        if current == goal:
+            return path
 
-        for nxt in get_neighbours(state):
-            if nxt not in visited:
-                stack.append(path + [nxt])
+        # push each new neighbour onto the stack
+        for neighbour in get_neighbours(current):
+            if neighbour not in visited:
+                new_path = path + [neighbour]
+                stack.append(new_path)
 
+    # no path found
     return None
 
 
@@ -181,9 +191,7 @@ def dfs(start, goal):
 # DEMONSTRATION SECTION
 # --------------------------------------------------
 
-print("===================================")
-print(" WEEK 2 - UNINFORMED SEARCH")
-print("===================================")
+print("Week 2: uninformed search")
 
 print("\nStart State:")
 print(START_STATE)
