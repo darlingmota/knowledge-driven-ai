@@ -74,15 +74,6 @@ def count_conflicts(board):
         conflict count = 0
     """
 
-    # TODO:
-    # Compare each queen with every queen
-    # that comes after it.
-    #
-    # Queens conflict when they are:
-    #
-    #   1. in the same row
-    #   2. on the same diagonal
-
     conflicts = 0
     # compare each pair of queens once
     for i in range(len(board)):
@@ -112,11 +103,6 @@ def generate_neighbours(problem, board):
 
     neighbours = []
 
-    # TODO:
-    #
-    # 1. Ask the problem for the available actions.
-    # 2. Apply each action.
-    # 3. Add the resulting state to neighbours.
     # apply every action to get every neighbour
     for action in problem.actions(board):
         new_board = problem.result(board, action)
@@ -271,7 +257,11 @@ if __name__ == "__main__":
     print(
         f"{len(neighbours)} neighbours generated"
     )
+    # each queen can move to 7 other rows, so 8 * 7 = 56 neighbours
+    # for a bigger N that's N(N-1), which gets expensive to generate and score every step
     # task 0: all 4 queens are on one diagonal, so all 6 pairs clash
+    # that's not a solution. moving one queen can reduce the conflicts
+    # we need a cost function so the algorithm can tell which board is better
     print("\nConflicts on the manual board:", count_conflicts(example_board))
 
     print("\nHill Climbing")
@@ -297,3 +287,22 @@ if __name__ == "__main__":
                 sa_wins = sa_wins + 1
     print(f"\nOut of {trials} random boards: Hill Climbing solved {hc_wins}, "
           f"Simulated Annealing solved {sa_wins}")
+
+    # hill climbing does not always solve it. it often stops with conflicts left
+    # it stops when no neighbour is strictly better, even if the cost is still above 0
+    # that's a local minimum. a plateau is when lots of neighbours have the same cost, so there's no clear direction
+    # accepting a worse move can get you off a local minimum
+    # when the temperature is high, annealing accepts worse moves more often and explores more
+    # as it cools it behaves more like hill climbing
+    # the two algorithms don't always give the same result. annealing varies more between runs
+    # the trade-off is more steps and more randomness, for a better chance of escaping
+    # in earlier batches of 50, hill climbing solved 7, 7, 4, 4 and 6, and annealing solved 10, 9, 13, 10 and 7
+    # annealing usually does a bit better, but neither one solves it every time
+    # it often stops at 180 steps because the temperature has cooled off, not necessarily because it found a solution
+
+    # search finds a path to a goal. optimisation starts with a full candidate and tries to improve its score
+    # you need a cost function so you can compare candidates
+    # hill climbing is deterministic for a given start, because it always takes a best neighbour
+    # annealing is stochastic, because it uses random neighbours and a random chance of accepting worse moves
+    # the Problem class let us use the same actions/result idea for the grid world and for n-queens
+    # in machine learning, training is also optimisation. gradient descent is close in spirit to hill climbing on a loss

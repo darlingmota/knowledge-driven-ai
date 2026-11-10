@@ -49,14 +49,6 @@ class GridProblem(Problem):
         Remember: an action must not move outside the grid.
         """
 
-        # TODO:
-        #
-        # 1. Extract x and y from state.
-        # 2. Create an empty list of actions.
-        # 3. Check which movements are valid.
-        # 4. Add valid actions to the list.
-        # 5. Return the list.
-
         x, y = state
         actions = []
         # only add a direction if it stays on the grid
@@ -81,12 +73,6 @@ class GridProblem(Problem):
 
             result = (1, 0)
         """
-
-        # TODO:
-        #
-        # 1. Extract x and y from state.
-        # 2. Check which action was requested.
-        # 3. Return the resulting state.
 
         x, y = state
         # move one square in the chosen direction
@@ -149,29 +135,10 @@ print(
 )
 
 
-# --------------------------------------------------
-# REFLECTION QUESTIONS
-# --------------------------------------------------
-
-"""
-Be ready to discuss:
-
-1. What information is stored in problem.initial?
-
-2. What information is stored in problem.goal?
-
-3. What is the difference between:
-
-       problem.actions(state)
-
-   and:
-
-       problem.result(state, action)
-
-4. Why doesn't Problem know anything about grids?
-
-5. Why doesn't GridProblem know anything about search?
-
-6. Could the same Problem structure be used for something
-   other than a grid?
-"""
+# reflection
+# problem.initial is the starting state, here (0, 0)
+# problem.goal is the target, here (4, 4)
+# actions(state) lists the moves you can make from here. result(state, action) applies one move and returns the new state
+# Problem is just a general template, so it doesn't know about grids and can be reused for other tasks
+# GridProblem only describes the world. the search stays separate, which is why the same structure also works for 8-queens
+# yes, anything with states and actions can use it, like n-queens

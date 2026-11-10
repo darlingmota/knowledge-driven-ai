@@ -101,7 +101,9 @@ import heapq  # pops the smallest item first
 # goal is (4, 4)
 # A (0, 0) -> 4 + 4 = 8
 # B (2, 2) -> 2 + 2 = 4
-# C (4, 3) -> 0 + 1 = 1, so C looks closest
+# C (4, 3) -> 0 + 1 = 1, so C looks closest and A looks furthest
+# that's useful because it tells the search what to try first
+# it is not the actual path though, and manhattan doesn't know about walls
 
 
 
@@ -189,6 +191,10 @@ def greedy_best_first_search(start, goal):
     # no path found
     return None
 
+# greedy always expands the lowest h, so it aims at the goal
+# bfs ignores the goal and goes level by level, so its first hit is a shortest path
+# greedy is not always shortest. if h leads it into a wall it can take a long detour
+
 
 # --------------------------------------------------
 # TASK 3 - ASTAR
@@ -240,6 +246,9 @@ def astar(start, goal):
     # no path found
     return None
 
+# g is the cost so far, h is the estimated cost left, f = g + h is the estimated total
+# a* uses f, greedy uses only h, bfs uses neither
+
 
 # --------------------------------------------------
 # TESTING AREA
@@ -286,3 +295,21 @@ if __name__ == "__main__":
     )
 
     print(astar_path)
+
+    # both greedy and a* found the same 18 move path (19 states), along the top then down the right
+    # that's optimal because manhattan from start to goal is 18
+    # the printed manhattan example is 14 because it uses GOAL_STATE (9, 9), not the task 1 goal (4, 4)
+    # this file doesn't run bfs or print node counts. on this grid greedy expanded 19 states
+    # and generated 34, while a* and bfs both expanded all 93 free cells and also found an 18 move path
+    # a* still has h, but a lot of cells have the same f value as 18 so it doesn't skip much here
+
+    # uninformed search (bfs/dfs) has no estimate of distance to the goal. informed search uses a heuristic
+    # a* is informed because of h. bfs doesn't need one because it already explores systematically
+    # a heuristic is an estimate of the cost left. that's h(n). g(n) is the cost so far. f is g+h
+    # greedy uses only h, a* uses g+h so it won't forget about the path already taken
+    # a useful heuristic is cheap, close to the true cost, and ideally never overestimates if you want a* to stay optimal
+    # obstacles don't change the heuristic, but they can make a low h misleading if a wall is in the way
+    # i didn't put h=0 in this file. if h is always 0 then f is just g, so a* acts like uniform-cost (like bfs here)
+    # i tried that on this same grid and it also expanded 93 and still found the 18 move path
+    # reused from week 2: neighbours, parents, and reconstruct_path. only the frontier ranking is new
+    # if every problem and search stay tightly mixed, you end up rewriting the same search for every new problem

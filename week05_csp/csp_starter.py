@@ -63,6 +63,10 @@ constraints = [
     ("Q", "NSW"),
     ("NSW", "V"),
 ]
+# variables are a list because it's just the regions in order
+# domains are a dict so you can look up the colours for a region quickly
+# a pair like ("WA", "NT") means those two are neighbours and must differ
+# to add a region, add it to the variables, give it a domain, and add its neighbouring pairs
 
 # --------------------------------------------------
 # TASK 2 — CONSTRAINT CHECKING
@@ -70,11 +74,6 @@ constraints = [
 
 def is_valid_assignment(assignment):
     """Return True if a complete OR partial assignment is valid."""
-    # TODO:
-    # 1. Loop over neighbouring pairs in constraints.
-    # 2. If BOTH regions have been assigned, compare their colours.
-    # 3. Return False if neighbouring regions have the same colour.
-    # 4. Otherwise return True.
     for region1, region2 in constraints:
         # only check pairs where both regions have a colour
         if region1 in assignment and region2 in assignment:
@@ -97,14 +96,6 @@ def select_unassigned_variable(assignment):
     choose the unassigned region with the FEWEST currently legal
     colours. Break ties by keeping the first region in variables.
     """
-    # TASK 3 TODO:
-    # Return the first variable not in assignment, or None if all
-    # variables have been assigned.
-    #
-    # TASK 5 TODO (after backtracking works):
-    # For each unassigned variable, temporarily try each colour,
-    # check is_valid_assignment(), and undo the temporary assignment.
-    # Count legal colours and choose the variable with the fewest.
     # task 3 version: just return the first unassigned region
     # task 5 version (MRV): pick the region with the fewest legal colours
     best_region = None
@@ -138,14 +129,6 @@ nodes_explored = 0  # how many colours we tried
 
 def backtracking_search(assignment):
     """Return a complete valid assignment, or None if none exists."""
-    # TODO:
-    # 1. If every variable has been assigned, return a COPY.
-    # 2. Choose a variable with select_unassigned_variable().
-    # 3. For each colour in its domain, temporarily assign it.
-    # 4. If the partial assignment is valid, search recursively.
-    # 5. Return the recursive result if a solution was found.
-    # 6. Otherwise remove the temporary assignment (backtrack).
-    # 7. Return None if every colour fails.
     global nodes_explored
 
     # every region has a colour, so we're done
@@ -182,9 +165,17 @@ def backtracking_search(assignment):
 #
 # answer: it stops as soon as two neighbours clash, so it skips
 # all the full assignments that would start that way
+# brute force would still build lots of those invalid complete assignments
+# finding one valid solution does not mean you've found all of them. this run stops at the first
+# the 10 colour attempts are tries of a colour, not 10 complete maps
 #
 # task 0: not valid. WA-NT are both Red and SA-V are both Green.
 # fix: make WA Blue and V Blue
+# catching a clash early means you can stop instead of finishing a doomed colouring
+#
+# MRV colours the most restricted region first, so a dead end shows up sooner
+# if a region already has zero legal colours, you backtrack immediately
+# it's a heuristic, so it isn't guaranteed to be faster. on a map this small both strategies can look similar
 
 
 # --------------------------------------------------
@@ -224,3 +215,9 @@ if __name__ == "__main__":
     print("2. Why can backtracking be faster than brute force?")
     print("3. Why might MRV reduce search?")
     print("4. How could this model represent timetabling?")
+
+    # backtracking happens when the region you're colouring has no legal colour left, so you undo the last choice
+    # it's faster than brute force because it rejects a partial assignment as soon as two neighbours clash
+    # MRV can reduce search by doing the tightest region first
+    # for a timetable, variables would be classes or exams, domains would be time slots and rooms,
+    # and constraints would be rules like a room or a lecturer can't be used twice at the same time

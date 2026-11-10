@@ -30,6 +30,8 @@ print(r"""
 print("Which values do the two MIN nodes return?")
 print("Which branch should MAX choose, and why?")
 # answer: left MIN gives 3, right MIN gives 2, so MAX picks left (3)
+# MAX would not get 9, because the right-hand MIN would choose 2
+# MAX takes the largest score because high is good for X. MIN takes the smallest because low is good for O
 
 # BOARD — X plays next (three X marks and two O marks).
 # Board positions are numbered 0 to 8, left to right, top to bottom.
@@ -52,7 +54,6 @@ WINNING_LINES = [
 
 def print_board(state):
     """Display the nine cells as a 3-by-3 board."""
-    # TODO: Print three rows of three cells.
     for row in range(3):
         # print one row of 3 cells
         start = row * 3
@@ -68,7 +69,6 @@ def print_board(state):
 
 def available_moves(state):
     """Return indices of empty cells (0 through 8)."""
-    # TODO: Find every position containing " ".
     moves = []
     # any empty cell is a legal move
     for i in range(9):
@@ -86,7 +86,6 @@ def make_move(state, move, player):
 
     Assume move is legal. Do not modify the input board.
     """
-    # TODO: Copy the board and place the player's mark.
     # copy so the original board doesn't change
     new_state = state.copy()
     new_state[move] = player
@@ -99,7 +98,6 @@ def make_move(state, move, player):
 
 def check_winner(state):
     """Return 'X', 'O' or None by checking all winning lines."""
-    # TODO: Check each (a, b, c) in WINNING_LINES.
     for a, b, c in WINNING_LINES:
         # three of the same mark in a line wins
         if state[a] != " " and state[a] == state[b] and state[b] == state[c]:
@@ -113,7 +111,6 @@ def check_winner(state):
 
 def is_terminal(state):
     """Return True for a win or a full board (draw)."""
-    # TODO: Detect a winner OR no remaining empty cells.
     # game over if someone won
     if check_winner(state) is not None:
         return True
@@ -132,7 +129,6 @@ def utility(state):
 
     Minimax calls this only at terminal states.
     """
-    # TODO: Use check_winner() and return +1, -1 or 0.
     winner = check_winner(state)
     # X wins = +1, O wins = -1, draw = 0
     if winner == "X":
@@ -152,12 +148,6 @@ def minimax(state, maximizing, counter):
     maximizing=True means X moves next; False means O moves next.
     counter is a one-item dictionary: {'nodes': 0}.
     """
-    # TODO:
-    # 1. Count this node: counter["nodes"] += 1.
-    # 2. If terminal, return utility(state).
-    # 3. For X (MAX), recursively choose the highest score.
-    # 4. For O (MIN), recursively choose the lowest score.
-    # Use make_move() to avoid changing the original board.
     # count this node
     counter["nodes"] = counter["nodes"] + 1
 
@@ -192,9 +182,6 @@ def best_move(state, counter):
 
     Count nodes in recursive Minimax searches. Ties use first move.
     """
-    # TODO: Try each legal X move, call minimax() for O's turn,
-    # and return the move with the highest score.
-    # If the board is terminal, return None.
     # no moves if the game is over
     if is_terminal(state):
         return None
@@ -221,10 +208,6 @@ def alpha_beta(state, maximizing, alpha, beta, counter):
     alpha = best score MAX can guarantee so far.
     beta  = best score MIN can guarantee so far.
     """
-    # TODO: Adapt minimax():
-    # - MAX updates alpha; MIN updates beta.
-    # - Stop exploring remaining moves if alpha >= beta.
-    # - Count visited nodes exactly as in minimax().
     # count this node
     counter["nodes"] = counter["nodes"] + 1
 
@@ -266,9 +249,6 @@ def alpha_beta(state, maximizing, alpha, beta, counter):
 
 def best_move_alpha_beta(state, counter):
     """Return the best move index for X using Alpha-Beta search."""
-    # TODO: Like best_move(), but call alpha_beta().
-    # Start alpha at -infinity and beta at +infinity.
-    # Update alpha after each candidate X move.
     # no moves if the game is over
     if is_terminal(state):
         return None
@@ -322,3 +302,13 @@ if __name__ == "__main__":
     print("2. Why does Minimax assume an optimal opponent?")
     print("3. What is the purpose of a utility function?")
     print("4. What happens as games become larger?")
+
+    # cell 5 wins immediately for X on the diagonal 2-5-8, so both algorithms pick it
+    # minimax visited 31 nodes, alpha-beta visited 17. they agree on the move, alpha-beta just searches less
+    # the 0 utility on the starting board is not a draw. the game isn't over yet
+    # pruning depends on move order. trying stronger moves first usually prunes more
+    # these counts are nodes visited in the tree, not unique boards
+    # tic-tac-toe is a search problem because it has states, legal moves, and terminal outcomes
+    # we assume an optimal opponent so we plan for the worst case
+    # the utility function scores finished games, here +1, -1 or 0, so the search can compare outcomes
+    # as games get larger the tree grows very quickly, so you use alpha-beta, a depth limit, and a heuristic evaluation
