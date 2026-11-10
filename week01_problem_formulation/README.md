@@ -47,3 +47,9 @@ What happens when we perform an action.
 - What exactly is a state?
 - What makes a move valid or invalid?
 - Why is defining the problem important before solving it?
+
+## My answers
+
+1. A state is a snapshot of where we are in the problem. In this lab it's just an (x, y) position on the grid.
+2. A move is valid if it stays inside the grid. If it would go off the edge, like from (0, 0) going left or up, it's invalid.
+3. The search can only work with what you've defined. If the states, actions and goal aren't clear, the algorithm has nothing solid to search over.

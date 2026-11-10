@@ -705,3 +705,14 @@ Hill Climbing always tries to improve the current state but can become trapped i
 Simulated Annealing introduces stochastic behaviour, allowing occasional worse moves in an attempt to explore the search space more effectively.
 
 These ideas provide an important foundation for later optimisation techniques and for understanding optimisation in Machine Learning.
+
+## My answers
+
+1. Search finds a path from a start state to a goal. Optimisation starts with a full candidate, like a whole board of queens, and tries to improve its score.
+2. You need a cost function so you can compare candidates and tell which one is better. Here that's the number of attacking pairs, and lower is better.
+3. Hill climbing gets stuck in a local minimum because it stops as soon as no neighbour is strictly better, even if there are still conflicts left.
+4. A plateau is when lots of neighbours have the same cost as the current board, so there's no clear direction to move.
+5. Simulated annealing sometimes accepts a worse move, more often when the temperature is high, so it can get off a local minimum. As it cools it behaves more like hill climbing. In my runs of 50 random boards, annealing usually solved a few more than hill climbing, but neither one solved every board.
+6. Hill climbing is deterministic for a given start, because it always takes a best neighbour. Annealing is stochastic, because it picks random neighbours and has a random chance of accepting worse moves.
+7. The Problem class is just a general template with actions, result and a goal test, so the same structure worked for the grid world in the tutorial and for n-queens in the main lab.
+8. Training a model in machine learning is also optimisation. Gradient descent is close in spirit to hill climbing, except it moves on a loss function instead of a board.

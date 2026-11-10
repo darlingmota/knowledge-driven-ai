@@ -334,3 +334,16 @@ You should also have noticed that the current program mixes together:
 This works for a small example, but as our problems and algorithms become more complex, we will need to think about how this code could be organised more clearly.
 
 In **Week 3**, we will build on BFS and DFS by introducing **informed search**, where additional information is used to guide the search towards the goal.
+
+## My answers
+
+1. BFS uses a queue, so it works FIFO and always expands the oldest path first.
+2. DFS uses a stack, so it works LIFO and always expands the newest path first.
+3. BFS found the shorter path. On my run it was 8 moves, and DFS was 12.
+4. BFS goes level by level, so the first time it reaches the goal it's already found a shortest path. DFS dives down one branch first, so it can find a longer route.
+5. On this grid they both ended up visiting all 22 free cells, so neither explored more than the other. The difference was the path length, not how many states they looked at.
+6. Obstacles just block those cells, so the path has to go around them. If they completely blocked the way to the goal, neither algorithm would find a path.
+7. We keep a visited set so we don't go back to the same cell again and get stuck in a loop.
+8. Most of the BFS and DFS code is the same: neighbours, the visited set, building the path, and the goal test. The only real difference is queue vs stack.
+9. The grid, start, goal, obstacles and get_neighbours are the problem. bfs and dfs are the search.
+10. I'd put the problem in its own class, with the states, actions and goal test, and keep the search algorithms separate so they can be reused on different problems. That's what we did later with the Problem class.

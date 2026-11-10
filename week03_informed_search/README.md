@@ -487,3 +487,20 @@ As we add more problems and more algorithms, you should also begin to notice tha
 - Search algorithms
 
 In the next lab, we will look at how some of these ideas can be organised into a more reusable structure.
+
+## My answers
+
+1. Uninformed search like BFS and DFS has no estimate of how close a state is to the goal. Informed search uses a heuristic to guide it.
+2. A* is informed because it uses h(n), an estimate of the remaining cost to the goal.
+3. BFS doesn't need a heuristic because it already explores systematically, level by level.
+4. A heuristic is an estimate of how far a state is from the goal, or how much cost is left.
+5. h(n) is that estimate of the remaining cost from n to the goal. I used Manhattan distance.
+6. g(n) is the cost of the path so far, so the number of steps already taken to reach n.
+7. f(n) is g(n) + h(n), the estimated total cost of the path going through n.
+8. Greedy only uses h(n), so it always heads towards whatever looks closest. A* uses g + h, so it doesn't forget about the path already taken.
+9. A useful heuristic is cheap to calculate, close to the true cost, and ideally never overestimates if you want A* to stay optimal.
+10. Obstacles don't change the heuristic itself, because Manhattan distance ignores walls. That can make a low h misleading if a wall is in the way.
+11. I didn't put h=0 in the file, but if h is always 0 then f is just g, so A* acts like uniform-cost search, which is the same as BFS on this grid. I tried it and it also expanded 93 states and still found the 18 move path.
+12. Greedy and A* both found the same 18 move path, along the top then down the right. That's optimal because Manhattan from start to goal is 18. Greedy expanded 19 states. A* and BFS both expanded all 93 free cells. A* still has h, but a lot of cells have the same f value as 18, so it doesn't skip much on this grid.
+13. I reused neighbours, parents, and reconstruct_path from week 2. Only the frontier ranking is new.
+14. If every problem and search stay tightly mixed, you end up rewriting the same search for every new problem.

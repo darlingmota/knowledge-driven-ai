@@ -149,3 +149,10 @@ git push origin main
 - [ ] Answer the reflection questions and push work to your fork.
 
 **Key takeaway:** Minimax chooses a move by considering an opponent who plays optimally. Alpha-Beta Pruning avoids exploring branches that cannot affect the final decision.
+
+## My answers
+
+1. Tic-tac-toe is a search problem because it has states (the board), legal moves, and terminal outcomes (win, loss or draw).
+2. Minimax assumes an optimal opponent so it plans for the worst case. If it assumed the other player might mess up, it could pick a risky move and lose against someone who plays well.
+3. The utility function scores finished games so the search can compare outcomes. Here a win for X is +1, a win for O is -1, and a draw is 0.
+4. As games get larger the tree grows very quickly, so you can't search everything. That's why we use alpha-beta, and for even bigger games you'd add a depth limit and a heuristic. On my board both algorithms picked move 5, but minimax visited 31 nodes and alpha-beta only visited 17.

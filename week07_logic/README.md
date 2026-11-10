@@ -195,3 +195,10 @@ Before finishing, verify that:
 - demo your work to your lab TA.
 
 **Summary:** Search explores possibilities. Knowledge representation stores statements and rules; logical inference derives conclusions from them.
+
+## My answers
+
+1. Logical entailment means a conclusion has to follow from the knowledge base using the rules of logic. If the facts and rules are true, the conclusion is true. It doesn't mean the knowledge base actually matches the real world.
+2. Forward chaining starts from the known facts and keeps firing any rule whose conditions are all met, adding the new facts. It repeats until nothing new gets added.
+3. Backward chaining starts from a goal and works backwards to see what would need to be true, until it reaches known facts or gets stuck. Forward chaining works out everything it can, while backward chaining only looks at what's needed for one goal.
+4. Propositional logic only has true/false statements, so it can't handle uncertainty. It also has no variables or objects, so you'd need a separate rule for every person or thing (like `parent_alice_bob`) instead of one general rule. Big problems end up needing loads of rules, and it can only reason about what you put in.

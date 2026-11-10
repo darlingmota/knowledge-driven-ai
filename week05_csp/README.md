@@ -521,3 +521,10 @@ Before finishing, make sure you can:
 - [ ] Implement and explain MRV.
 - [ ] Commit and push your work to your own GitHub fork.
 - [ ] Answer the reflection questions.
+
+## My answers
+
+1. Backtracking happens when the region you're colouring has no legal colour left, so you undo the last choice and try a different one. On the map, that would be like colouring WA and NT the same by mistake, then having to go back.
+2. It's faster than brute force because it rejects a partial assignment as soon as two neighbours clash, so it never finishes all the doomed colourings. Brute force would still check lots of the 729 complete assignments. My backtracking only made 10 colour attempts before finding a valid map.
+3. MRV colours the most restricted region first, so a dead end shows up sooner. If a region already has zero legal colours, you backtrack immediately.
+4. For a timetable, the variables would be classes or exams, the domains would be time slots and rooms, and the constraints would be rules like a room or a lecturer can't be used twice at the same time.
